@@ -8,7 +8,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 
 const AuthContext = createContext(null);
 const STORAGE_KEY = 'casevault.auth';
-const API_BASE_URL = 'http://localhost:5000/api/auth';
+const API_BASE_URL = 'https://casevault-1.vercel.app/api/auth';
 
 function loadStoredSession() {
   try {
