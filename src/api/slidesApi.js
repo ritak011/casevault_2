@@ -44,17 +44,24 @@ export async function fetchSlideById(id) {
  * POST /api/slides
  * Protected — Formats the frontend data payload to strictly match the Mongoose Schema.
  */
+/**
+ * POST /api/slides
+ * Protected — Formats the frontend data payload to strictly match the Mongoose Schema.
+ */
 export async function createSlide(payload, token) {
   if (!token) throw new Error('Unauthorized action: missing token');
 
-  // Safely map frontend form fields to the backend structure
+  // Safely map frontend form fields directly without hardcoded placeholders overwriting them
   const backendPayload = {
     title: payload.title,
     description: payload.description,
-    tags: [payload.category], // Converts string to the array required by Mongoose
-    previewImageUrl: payload.previewImageUrl || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe', // Fallback placeholder
-    slideUrl: payload.slideUrl || 'https://example.com/mock-deck.pdf', // Fallback link
-    competitionName: payload.competition, // Fixed field name mapping
+    tags: [payload.category || 'Strategy'], 
+    
+    // Check both potential key naming patterns from your form state:
+    previewImageUrl: payload.previewImageUrl || payload.image || '', 
+    slideUrl: payload.slideUrl || payload.url || '', 
+    
+    competitionName: payload.competition || payload.competitionName || '', 
     year: Number(payload.year),
   };
 
