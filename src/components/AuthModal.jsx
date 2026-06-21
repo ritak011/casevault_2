@@ -100,21 +100,7 @@ export default function AuthModal() {
           </button>
         </form>
 
-        <div className="my-4 flex items-center gap-2">
-          <div className="h-px flex-1 bg-white/10" />
-          <span className="text-xs text-slate-500">or continue with</span>
-          <div className="h-px flex-1 bg-white/10" />
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <button onClick={() => handleOAuth('Google')} disabled={loading} className="btn-ghost">
-            <Chrome size={16} /> Google
-          </button>
-          <button onClick={() => handleOAuth('GitHub')} disabled={loading} className="btn-ghost">
-            <Github size={16} /> GitHub
-          </button>
-        </div>
-
+   
         <p className="mt-5 text-center text-sm text-slate-400">
           {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
           <button
