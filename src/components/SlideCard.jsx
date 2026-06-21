@@ -1,19 +1,49 @@
 import React from 'react';
-import { Eye, Building2, Presentation } from 'lucide-react';
+import { Eye, Building2, Presentation, Trash2 } from 'lucide-react';
 import { tagStyleFor } from './FilterBar.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 
-/**
- * A single case-study card for the gallery grid.
- * Displays: category tag, preview thumbnail, title, description,
- * institution/competition name, and year — fully matching recruitment spec.
- */
-export default function SlideCard({ slide }) {
-  // Map backend array tags or fallback to category string safely
+export default function SlideCard({ slide, onDeleteSuccess }) {
+  const { user, token } = useAuth();
+  
   const currentCategory = slide.category || (slide.tags && slide.tags[0]) || 'Strategy';
   const displayCompetition = slide.competition || slide.competitionName;
-
-  // Find the valid link inside the dynamic object payload returned from MongoDB
   const targetUrl = slide.fileUrl || slide.url || slide.pdfUrl;
+
+  // Check if the current logged-in user is the owner of this slide
+  // Handles both populated object schemas or raw string IDs from MongoDB
+  const isOwner = user && slide.user && (user.id === slide.user || user._id === slide.user._id || user.id === slide.user._id);
+
+  async function handleDelete(e) {
+    // Prevent clicking the delete button from opening the slide URL link
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!window.confirm(`Are you sure you want to delete "${slide.title}"?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`https://casevault-1.vercel.app/api/slides/${slide._id || slide.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const result = await response.ok ? await response.json() : null;
+      if (response.ok) {
+        alert("Case deleted successfully.");
+        if (onDeleteSuccess) onDeleteSuccess();
+      } else {
+        const errData = await response.json().catch(() => ({}));
+        alert(errData.message || "Failed to delete the case study.");
+      }
+    } catch (err) {
+      console.error("Error deleting slide:", err);
+      alert("Network error: Could not complete deletion.");
+    }
+  }
 
   return (
     <a
@@ -31,7 +61,6 @@ export default function SlideCard({ slide }) {
             alt={slide.title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             onError={(e) => {
-              // Fallback if image path breaks
               e.target.onerror = null;
               e.target.style.display = 'none';
               e.target.nextSibling.style.display = 'flex';
@@ -39,7 +68,6 @@ export default function SlideCard({ slide }) {
           />
         ) : null}
 
-        {/* Fallback geometric panel if image is missing or breaks */}
         <div 
           className={`hidden absolute inset-0 bg-gradient-to-br ${slide.previewColor || 'from-violet-600/30 to-noir-800'} flex-col items-center justify-center gap-2`}
           style={!slide.previewImageUrl ? { display: 'flex' } : {}}
@@ -47,10 +75,20 @@ export default function SlideCard({ slide }) {
           <Presentation size={24} className="text-white/20" />
         </div>
 
-        {/* Category Pill Tag */}
         <span className={`tag-pill absolute left-3 top-3 z-10 border ${tagStyleFor(currentCategory)}`}>
           {currentCategory}
         </span>
+
+        {/* PROTECTED ACTION: Only render delete button if authorized owner */}
+        {isOwner && (
+          <button
+            onClick={handleDelete}
+            className="absolute right-3 top-3 z-20 p-2 bg-red-950/80 hover:bg-red-900 border border-red-500/30 rounded-lg text-red-400 hover:text-red-200 transition-all shadow-md"
+            title="Delete Case Study"
+          >
+            <Trash2 size={14} />
+          </button>
+        )}
         
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.04),transparent_60%)]" />
       </div>

@@ -7,12 +7,6 @@ import { LayoutGrid } from 'lucide-react';
 
 const PAGE_LIMIT = 6;
 
-/**
- * Home Page — "The Gallery"
- * Owns all gallery state (page, category, search, sort) and re-fetches
- * from slidesApi whenever any of it changes, mirroring how this would
- * work against the real GET /api/slides?page=&limit=&category=&search=&sort=
- */
 export default function HomePage({ search }) {
   const [slides, setSlides] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, totalPages: 1 });
@@ -20,6 +14,9 @@ export default function HomePage({ search }) {
   const [sort, setSort] = useState('latest');
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  
+  // Create a refresh toggle to manually trigger the API fetch hook on deletion
+  const [refreshTrigger, setRefreshTrigger] = useState(false);
 
   // Reset to page 1 whenever filters/search change
   useEffect(() => {
@@ -29,6 +26,7 @@ export default function HomePage({ search }) {
   useEffect(() => {
     let active = true;
     setLoading(true);
+    // Added refreshTrigger to dependency array below so this runs when updated
     fetchSlides({ page, limit: PAGE_LIMIT, category, search, sort }).then((res) => {
       if (!active) return;
       setSlides(res.data);
@@ -38,7 +36,12 @@ export default function HomePage({ search }) {
     return () => {
       active = false;
     };
-  }, [page, category, search, sort]);
+  }, [page, category, search, sort, refreshTrigger]);
+
+  // Handler passed to child SlideCard components
+  const triggerRefresh = () => {
+    setRefreshTrigger(prev => !prev);
+  };
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
@@ -75,7 +78,11 @@ export default function HomePage({ search }) {
       ) : (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {slides.map((slide) => (
-            <SlideCard key={slide.id} slide={slide} />
+            <SlideCard 
+              key={slide.id || slide._id} 
+              slide={slide} 
+              onDeleteSuccess={triggerRefresh} // <-- WIRE PROP HERE
+            />
           ))}
         </div>
       )}
