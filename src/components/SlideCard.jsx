@@ -12,10 +12,16 @@ export default function SlideCard({ slide }) {
   const currentCategory = slide.category || (slide.tags && slide.tags[0]) || 'Strategy';
   const displayCompetition = slide.competition || slide.competitionName;
 
+  // Find the valid link inside the dynamic object payload returned from MongoDB
+  const targetUrl = slide.fileUrl || slide.url || slide.pdfUrl;
+
   return (
-    <article
-      className="glass-panel group relative flex flex-col overflow-hidden rounded-xl
-        transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:shadow-glow"
+    <a
+      href={targetUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="glass-panel group relative flex flex-col overflow-hidden rounded-xl cursor-pointer
+        transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:shadow-glow block text-left"
     >
       {/* Preview Thumbnail Container */}
       <div className="relative h-40 w-full overflow-hidden bg-noir-950 flex items-center justify-center border-b border-white/5">
@@ -70,6 +76,6 @@ export default function SlideCard({ slide }) {
           </span>
         </div>
       </div>
-    </article>
+    </a>
   );
 }
