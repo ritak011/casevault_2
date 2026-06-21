@@ -20,9 +20,9 @@ export default function AuthModal() {
     setLoading(true);
     try {
       if (mode === 'login') {
-        await login({ email: form.email });
+        await login({ email: form.email, password: form.password});
       } else {
-        await register({ name: form.name, email: form.email });
+        await register({ name: form.name, email: form.email, password: form.password });
       }
     } finally {
       setLoading(false);
@@ -67,7 +67,7 @@ export default function AuthModal() {
                 className="input-field"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Ann Sharma"
+                placeholder="Sharma Ji"
               />
             </div>
           )}
