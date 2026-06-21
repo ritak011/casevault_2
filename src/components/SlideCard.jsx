@@ -5,6 +5,9 @@ import { useAuth } from '../context/AuthContext.jsx';
 
 export default function SlideCard({ slide, onDeleteSuccess }) {
   const { user, token } = useAuth();
+  console.log("DEBUG IDs -> Logged In User:", user, "Slide Owner:", slide.user);
+
+
   
   const currentCategory = slide.category || (slide.tags && slide.tags[0]) || 'Strategy';
   const displayCompetition = slide.competition || slide.competitionName;
