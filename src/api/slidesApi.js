@@ -54,11 +54,14 @@ export async function createSlide(payload, token) {
   // Safely map frontend form fields directly without hardcoded placeholders overwriting them
 const backendPayload = {
     title: payload.title,
+    description: payload.description || payload.desc || '',
     
-    // Fallback choices matching standard short keys
-    description: payload.description || payload.desc || payload.summary || '',
-    previewImageUrl: payload.previewImageUrl || payload.image || payload.thumbnail || payload.previewUrl || '', 
-    slideUrl: payload.slideUrl || payload.url || payload.link || payload.fileUrl || '', 
+    // Pass BOTH format options so the backend validation passes either setup
+    tags: Array.isArray(payload.tags) ? payload.tags : [payload.category || 'Strategy'],
+    category: payload.category || 'Strategy', 
+    
+    previewImageUrl: payload.previewImageUrl || payload.image || '', 
+    slideUrl: payload.slideUrl || payload.url || '', 
     
     competitionName: payload.competition || payload.competitionName || '', 
     year: Number(payload.year) || 2026,
