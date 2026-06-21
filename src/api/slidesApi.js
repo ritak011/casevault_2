@@ -52,17 +52,16 @@ export async function createSlide(payload, token) {
   if (!token) throw new Error('Unauthorized action: missing token');
 
   // Safely map frontend form fields directly without hardcoded placeholders overwriting them
-  const backendPayload = {
+const backendPayload = {
     title: payload.title,
-    description: payload.description,
-    tags: [payload.category || 'Strategy'], 
     
-    // Check both potential key naming patterns from your form state:
-    previewImageUrl: payload.previewImageUrl || payload.image || '', 
-    slideUrl: payload.slideUrl || payload.url || '', 
+    // Fallback choices matching standard short keys
+    description: payload.description || payload.desc || payload.summary || '',
+    previewImageUrl: payload.previewImageUrl || payload.image || payload.thumbnail || payload.previewUrl || '', 
+    slideUrl: payload.slideUrl || payload.url || payload.link || payload.fileUrl || '', 
     
     competitionName: payload.competition || payload.competitionName || '', 
-    year: Number(payload.year),
+    year: Number(payload.year) || 2026,
   };
 
   const response = await fetch(`${API_BASE_URL}/slides`, {
