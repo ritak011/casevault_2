@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 
 export default function SlideCard({ slide, onDeleteSuccess }) {
   const { user, token } = useAuth();
-  console.log("DEBUG IDs -> Logged In User:", user, "Slide Owner:", slide.user);
+  console.log("DEBUG IDs -> Logged In User:", user, "Slide Owner:", slide.uploadedBy);
 
 
   
@@ -15,7 +15,7 @@ export default function SlideCard({ slide, onDeleteSuccess }) {
 
   // Check if the current logged-in user is the owner of this slide
   // Handles both populated object schemas or raw string IDs from MongoDB
-  const isOwner = user && slide.user && (user.id === slide.user || user._id === slide.user._id || user.id === slide.user._id);
+  const isOwner = user && slide.uploadedBy && (user.id === slide.uploadedBy || user._id === slide.uploadedBy );
 
   async function handleDelete(e) {
     // Prevent clicking the delete button from opening the slide URL link
