@@ -15,8 +15,11 @@ export default function SlideCard({ slide, onDeleteSuccess }) {
 
   // Check if the current logged-in user is the owner of this slide
   // Handles both populated object schemas or raw string IDs from MongoDB
-  const isOwner = user && slide.uploadedBy && (user.id === slide.uploadedBy || user._id === slide.uploadedBy );
-
+ const isOwner = user && slide.uploadedBy && (
+  String(user.id) === String(slide.uploadedBy) || 
+  String(user._id) === String(slide.uploadedBy) ||
+  (slide.uploadedBy._id && String(user.id) === String(slide.uploadedBy._id))
+);
   async function handleDelete(e) {
     // Prevent clicking the delete button from opening the slide URL link
     e.preventDefault();
